@@ -16,12 +16,14 @@
         <th>Name</th>
         <th>Surname</th>
         <th>Email</th>
+        <th>Role</th>
         <th>Operations</th>
     </tr>
     <tr th:each="u : ${users}">
         <td th:text="${u.name}"></td>
         <td th:text="${u.surname}"></td>
         <td th:text="${u.email}"></td>
+        <td th:text="${u.role}"></td>
         <td>
             <input type="button" value="Update"
                    th:onclick="'window.location.href=\'/admin/updateInfo?id=' + ${u.id} + '\';'"/>

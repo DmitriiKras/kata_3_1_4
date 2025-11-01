@@ -1,7 +1,6 @@
-package ru.kata.spring.boot_security.demo.configs;
+package ru.kata.spring.boot_security.demo.configs.config;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

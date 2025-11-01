@@ -2,18 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>User Info</title>
+    <title>Edit User</title>
 </head>
 <body>
 
-<h2>User Info</h2>
+<h2>Edit User</h2>
 
 <form th:action="@{/admin/saveUser}" method="post" th:object="${user}">
     <input type="hidden" th:field="*{id}">
     Name: <input type="text" th:field="*{name}"><br><br>
     Surname: <input type="text" th:field="*{surname}"><br><br>
     Email: <input type="text" th:field="*{email}"><br><br>
-    Password: <input type="password" th:field="*{password}"><br><br>
+    Password: <input type="password" th:field="*{password}" placeholder="Оставьте пустым для сохранения текущего"><br><br>
 
     <select multiple name="roleIds">
         <option th:each="r : ${allRoles}"

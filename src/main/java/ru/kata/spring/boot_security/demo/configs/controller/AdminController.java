@@ -8,25 +8,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.configs.Service.UserService;
-import ru.kata.spring.boot_security.demo.configs.model.Role;
 import ru.kata.spring.boot_security.demo.configs.model.User;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final PasswordEncoder passwordEncoder;
 
     private final UserService userService;
     @Autowired
-    public AdminController(UserService userService, PasswordEncoder passwordEncoder) {
+    public AdminController(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping()
@@ -53,25 +48,15 @@ public class AdminController {
     @PostMapping("/saveUser")
     public String saveUser(@ModelAttribute("user") User user,
                            @RequestParam(value="roleIds", required=false) List<Long> roleIds) {
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
 
-        if (roleIds != null) {
-            Set<Role> roles = roleIds.stream()
-                    .map(id -> userService.getRoleById(id))
-                    .collect(Collectors.toSet());
-            user.setRole(roles);
-        }
-
-        userService.saveUser(user);
+        userService.saveOrUpdateUser(user, roleIds);
         return "redirect:/admin";
     }
 
     @GetMapping("/updateInfo")
     public String updateUser(@RequestParam("id") long id, Model model) {
-        User user = userService.getUser(id);
-        model.addAttribute("user",user);
+        model.addAttribute("user", userService.getUser(id));
+        model.addAttribute("allRoles", userService.getAllRoles());
         return "user-info";
     }
 

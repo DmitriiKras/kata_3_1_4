@@ -50,12 +50,12 @@ public class Role implements GrantedAuthority {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Role r = (Role) o;
-        return Objects.equals(role, r.role);
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(role);
+        Role role = (Role) o;
+        return Objects.equals(id, role.id);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
