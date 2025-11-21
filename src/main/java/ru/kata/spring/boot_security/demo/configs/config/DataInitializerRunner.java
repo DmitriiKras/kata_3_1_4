@@ -11,6 +11,7 @@ import ru.kata.spring.boot_security.demo.configs.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 @Component
@@ -28,37 +29,43 @@ public class DataInitializerRunner implements CommandLineRunner {
 
     @Override
     @Transactional
-    public void run(String... args) throws Exception {
-        if (roleDao.findByName("ROLE_ADMIN").isEmpty()) {
-            roleDao.save(new Role("ROLE_ADMIN"));
-        }
-        if (roleDao.findByName("ROLE_USER").isEmpty()) {
-            roleDao.save(new Role("ROLE_USER"));
-        }
+    public void run(String... args) {
+        // Создаём роли
+        createRoleIfNotExists("ROLE_ADMIN");
+        createRoleIfNotExists("ROLE_USER");
 
-        if (userDao.findByUsername("admin").isEmpty()) {
-            Role adminRole = roleDao.findByName("ROLE_ADMIN").get();
-            Role userRole = roleDao.findByName("ROLE_USER").get();
+        // Создаём пользователей
+        createUserIfNotExists("admin", "Admin", "admin", "admin", Set.of("ROLE_ADMIN", "ROLE_USER"));
+        createUserIfNotExists("user", "User", "user", "user", Set.of("ROLE_USER"));
+    }
 
-            User admin = new User();
-            admin.setName("admin");
-            admin.setSurname("Admin");
-            admin.setEmail("admin@mail.com");
-            admin.setPassword(passwordEncoder.encode("admin"));
-            admin.setRole(Set.of(adminRole, userRole));
-            userDao.saveUser(admin);
+    private void createRoleIfNotExists(String roleName) {
+        if (roleDao.findByName(roleName).isEmpty()) {
+            roleDao.save(new Role(roleName));
         }
+    }
 
-        if (userDao.findByUsername("user").isEmpty()) {
-            Role userRole = roleDao.findByName("ROLE_USER").get();
+    private void createUserIfNotExists(String name, String surname, String username, String password, Set<String> roleNames) {
+        // Проверяем существование пользователя по имени (name)
+        boolean exists = userDao.getAllUsers()
+                .stream()
+                .anyMatch(u -> u.getName().equals(name));
+        if (exists) return;
 
-            User user = new User();
-            user.setName("user");
-            user.setSurname("User");
-            user.setEmail("user@mail.com");
-            user.setPassword(passwordEncoder.encode("user"));
-            user.setRole(Set.of(userRole));
-            userDao.saveUser(user);
-        }
+        // Получаем роли
+        Set<Role> roles = roleNames.stream()
+                .map(rn -> roleDao.findByName(rn).get())
+                .collect(Collectors.toSet());
+
+        // Создаём пользователя
+        User user = new User();
+        user.setName(name);
+        user.setSurname(surname);
+        user.setEmail(username); // можно использовать как логин, если нужно, или просто оставить как name
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(roles);
+
+        // Сохраняем пользователя
+        userDao.saveUser(user);
     }
 }

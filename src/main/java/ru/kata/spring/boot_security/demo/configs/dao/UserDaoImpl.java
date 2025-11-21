@@ -1,14 +1,13 @@
 package ru.kata.spring.boot_security.demo.configs.dao;
 
-
 import org.springframework.stereotype.Repository;
 import ru.kata.spring.boot_security.demo.configs.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
-
 
 @Repository
 public class UserDaoImpl implements UserDao {
@@ -18,9 +17,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-
-        return entityManager.createQuery("SELECT u FROM User u", User.class)
-                .getResultList();
+        return entityManager.createQuery("from User", User.class).getResultList();
     }
 
     @Override
@@ -34,30 +31,22 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User getUser(long id) {
-        User user = entityManager.find(User.class, id);
-        return user;
+        return entityManager.find(User.class, id);
     }
 
     @Override
     public void deleteUser(long id) {
-        User user = entityManager.find(User.class, id);
-         if (user != null) {
-             entityManager.remove(user);
-         }
-    }
-
-    @Override
-    public Optional<User> findByUsername(String username) {
-        List<User> result = entityManager.createQuery(
-                        "SELECT u FROM User u WHERE u.name = :name", User.class)
-                .setParameter("name", username)
-                .getResultList();
-
-        if (result.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(result.get(0));
+        User user = getUser(id);
+        if (user != null) {
+            entityManager.remove(user);
         }
     }
 
+    @Override
+    public Optional<User> findByName(String name) {
+        TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class);
+        query.setParameter("name", name);
+        List<User> result = query.getResultList();
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+    }
 }
