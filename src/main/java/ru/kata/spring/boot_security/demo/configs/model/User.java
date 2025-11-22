@@ -59,7 +59,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return  this.name;
+        return this.name;
     }
 
     @Override
@@ -81,6 +81,7 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
     @Override
     public String getPassword() {
         return password;
@@ -90,7 +91,8 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public User() {}
+    public User() {
+    }
 
     public Set<Role> getRole() {
         return role;
@@ -144,5 +146,4 @@ public class User implements UserDetails {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }
